@@ -15,7 +15,7 @@ public class DateValidator {
     }
 
     public boolean validate(int day, int month, int year) {
-        return validDay(day, month, year) && validMonth(month) && validYear(year);
+        return validYear(year) && validMonth(month) && validDay(day, month, year);
     }
 
     private boolean validDay(int day, int month, int year) {

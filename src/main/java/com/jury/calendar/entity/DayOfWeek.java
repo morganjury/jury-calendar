@@ -1,5 +1,7 @@
 package com.jury.calendar.entity;
 
+import java.util.Calendar;
+
 public enum DayOfWeek {
 
     MONDAY("Monday"),
@@ -29,6 +31,10 @@ public enum DayOfWeek {
     @Override
     public String toString() {
         return getDisplayName();
+    }
+
+    public int asJavaUtilDayOfWeek() {
+        return this == SUNDAY ? Calendar.SUNDAY : index + 1;
     }
 
     public static DayOfWeek get(int index) {

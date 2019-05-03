@@ -8,14 +8,15 @@ import java.util.GregorianCalendar;
 
 public class MyCalendar {
 
-    // financial week should be determined by day of week
+    // financial week should be determined by
     //  e.g. MONDAY
-    // financial month should be determined by first day of week in month or first day in month of month
+    // financial month should be determined by
     //  e.g. MONDAY
     //  e.g. 1st
-    // financial year should be determined by first day of week in year or first day of month and month in year
+    // financial year should be determined by
     //  e.g. MONDAY
-    //  e.g. 6th APRIL
+    //  e.g. 6th APRIL // UkTaxYearCalendar extends MyCalendar
+    //  e.g. MONDAY APRIL
 
     private StartOfWeek startOfWeek;
     private StartOfMonth startOfMonth;
@@ -55,29 +56,54 @@ public class MyCalendar {
     }
 
     public int getFinancialMonth(LocalDate date) {
-        // TODO this will need tweaking if startOfMonth is a date
-        int startOfMonth = getFirstWeekStartOfMonth(MonthOfYear.get(date.getMonthValue()), date.getYear());
-        return (startOfMonth <= date.getDayOfMonth())
-                ? date.getMonthValue()
-                : ((date.getMonthValue() > 1)
+        if (startOfMonth.isADay()) {
+            int startOfMonth = getFirstWeekStartOfMonth(MonthOfYear.get(date.getMonthValue()), date.getYear());
+            return (startOfMonth <= date.getDayOfMonth())
+                    ? date.getMonthValue()
+                    : ((date.getMonthValue() > 1)
                     ? date.getMonthValue() - 1
                     : 12);
+        }
+        LocalDate monthStartDate = LocalDate.of(date.getYear(), date.getMonthValue(), startOfMonth.getDayInMonth());
+        if (date.compareTo(monthStartDate) == 0 || date.isAfter(monthStartDate)) {
+            return date.getMonthValue();
+        } else {
+            return ((date.getMonthValue() > 1)
+                    ? date.getMonthValue() - 1
+                    : 12);
+        }
     }
 
     public int getFinancialYear(LocalDate date) {
-        // TODO this will need tweaking if startOfYear is a date
-        return (getFinancialMonth(date) == 12 && date.getMonthValue() == 1)
-                ? date.getYear() - 1
-                : date.getYear();
+        if (startOfYear.getDayOfWeek() != null && startOfYear.getMonthOfYear() == null) {
+            return (getFinancialMonth(date) == 12 && date.getMonthValue() == 1)
+                    ? date.getYear() - 1
+                    : date.getYear();
+        }
+        LocalDate yearStartDate;
+        if (startOfYear.getDayInMonth() != null) {
+            yearStartDate = LocalDate.of(date.getYear(), startOfYear.getMonthOfYear().getIndex(), startOfYear.getDayInMonth());
+        } else {
+            int dayInMonthForYear = getFirstWeekStartOfMonth(startOfYear.getDayOfWeek(), startOfYear.getMonthOfYear(), date.getYear());
+            yearStartDate = LocalDate.of(date.getYear(), startOfYear.getMonthOfYear().getIndex(), dayInMonthForYear);
+        }
+        if (date.isBefore(yearStartDate) && date.isAfter(yearStartDate.minusYears(1))) {
+            return date.getYear() - 1;
+        } else {
+            return date.getYear();
+        }
     }
 
     // this is where things might be able to be removed
 
-    int getFirstWeekStartOfMonth(MonthOfYear monthOfYear, int year) {
+    private int getFirstWeekStartOfMonth(MonthOfYear monthOfYear, int year) {
+        return getFirstWeekStartOfMonth(startOfWeek.getDayOfWeek(), monthOfYear, year);
+    }
+
+    int getFirstWeekStartOfMonth(DayOfWeek dayOfWeek, MonthOfYear monthOfYear, int year) {
         // financial weeks are independent of financial months so we need only consider startOfWeek
         Calendar cacheCalendar = Calendar.getInstance();
-        int javaUtilDayOfWeek = startOfWeek.getDayOfWeek()== DayOfWeek.SUNDAY ? 1 : startOfWeek.getDayOfWeek().getIndex() + 1;
-        cacheCalendar.set(Calendar.DAY_OF_WEEK, javaUtilDayOfWeek);
+        cacheCalendar.set(Calendar.DAY_OF_WEEK, dayOfWeek.asJavaUtilDayOfWeek());
         cacheCalendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
         cacheCalendar.set(Calendar.MONTH, monthOfYear.getIndex() - 1);
         cacheCalendar.set(Calendar.YEAR, year);

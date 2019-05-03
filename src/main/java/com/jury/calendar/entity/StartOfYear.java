@@ -10,6 +10,11 @@ public class StartOfYear {
         this.dayOfWeek = dayOfWeek;
     }
 
+    public StartOfYear(DayOfWeek dayOfWeek, MonthOfYear monthOfYear) {
+        this.dayOfWeek = dayOfWeek;
+        this.monthOfYear = monthOfYear;
+    }
+
     public StartOfYear(int dayInMonth, MonthOfYear monthOfYear) {
         this.dayInMonth = dayInMonth;
         this.monthOfYear = monthOfYear;
@@ -19,20 +24,12 @@ public class StartOfYear {
         return dayOfWeek;
     }
 
-    public int getDayInMonth() {
+    public Integer getDayInMonth() {
         return dayInMonth;
     }
 
     public MonthOfYear getMonthOfYear() {
         return monthOfYear;
-    }
-
-    public boolean isADay() {
-        return dayOfWeek != null;
-    }
-
-    public boolean isADate() {
-        return dayOfWeek == null;
     }
 
 }
