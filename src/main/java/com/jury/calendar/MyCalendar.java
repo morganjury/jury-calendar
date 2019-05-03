@@ -114,7 +114,7 @@ public class MyCalendar {
         return getFirstWeekStartOfMonth(MonthOfYear.JANUARY, year);
     }
 
-    int weeksInMonth(MonthOfYear month, int year) {
+    public int weeksInMonth(MonthOfYear month, int year) {
         int firstWeekStart = getFirstWeekStartOfMonth(month, year);
         int numDays = daysInMonth(month, year);
         return ((numDays - firstWeekStart) / 7) + 1;
