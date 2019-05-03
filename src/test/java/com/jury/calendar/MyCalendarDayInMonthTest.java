@@ -26,21 +26,21 @@ public class MyCalendarDayInMonthTest extends MainTest {
     @FileParameters(testResources + "MyCalendarDayInMonthTest/financialMonth.csv")
     public void financialMonth(DayOfWeek startOfWeek, int startOfMonth, int day, int month, int year, int expected) {
         myCalendar = new MyCalendar(new StartOfWeek(startOfWeek), new StartOfMonth(startOfMonth), new StartOfYear(startOfMonth, MonthOfYear.JANUARY));
-        assertEquals(expected, myCalendar.getFinancialMonth(LocalDate.of(year, month, day)));
+        assertEquals(expected, myCalendar.getCategorisedMonth(LocalDate.of(year, month, day)));
     }
 
     @Test
     @FileParameters(testResources + "MyCalendarDayInMonthTest/financialYearForDayInMonth.csv")
     public void financialYearStartingOnDayInMonth(DayOfWeek startOfWeek, int startOfMonth, MonthOfYear startOfYear, int day, int month, int year, int expected) {
         myCalendar = new MyCalendar(new StartOfWeek(startOfWeek), new StartOfMonth(startOfMonth), new StartOfYear(startOfMonth, startOfYear));
-        assertEquals(expected, myCalendar.getFinancialYear(LocalDate.of(year, month, day)));
+        assertEquals(expected, myCalendar.getCategorisedYear(LocalDate.of(year, month, day)));
     }
 
     @Test
     @FileParameters(testResources + "MyCalendarDayInMonthTest/financialYearForDayOfWeek.csv")
     public void financialYearStartingOnDayOfWeek(DayOfWeek startOfWeek, int startOfMonth, MonthOfYear startOfYear, int day, int month, int year, int expected) {
         myCalendar = new MyCalendar(new StartOfWeek(startOfWeek), new StartOfMonth(startOfMonth), new StartOfYear(startOfWeek, startOfYear));
-        assertEquals(expected, myCalendar.getFinancialYear(LocalDate.of(year, month, day)));
+        assertEquals(expected, myCalendar.getCategorisedYear(LocalDate.of(year, month, day)));
     }
 
 }

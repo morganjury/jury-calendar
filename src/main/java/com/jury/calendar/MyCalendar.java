@@ -15,7 +15,7 @@ public class MyCalendar {
     //  e.g. 1st
     // financial year should be determined by
     //  e.g. MONDAY
-    //  e.g. 6th APRIL // UkTaxYearCalendar extends MyCalendar
+    //  e.g. 6th APRIL // UkTaxYearCalendar
     //  e.g. MONDAY APRIL
 
     private StartOfWeek startOfWeek;
@@ -26,9 +26,6 @@ public class MyCalendar {
         this(startOfWeek, new StartOfMonth(startOfWeek.getDayOfWeek()), new StartOfYear(startOfWeek.getDayOfWeek()));
     }
 
-    // TODO is there a way of taking startofweek and startofmonth?
-    //  would startofyear take startofweek or startofmonth value?
-
 
     public MyCalendar(StartOfWeek startOfWeek, StartOfMonth startOfMonth, StartOfYear startOfYear) {
         this.startOfWeek = startOfWeek;
@@ -36,12 +33,12 @@ public class MyCalendar {
         this.startOfYear = startOfYear;
     }
 
-    public int getFinancialWeek(LocalDate date) {
+    public int getCategorisedWeek(LocalDate date) {
         LocalDate firstWeekStartOfYear = LocalDate.of(date.getYear(), MonthOfYear.JANUARY.getIndex(), getFirstWeekStartOfYear(date.getYear()));
         if (date.isBefore(firstWeekStartOfYear)) {
             // bug where 2019-01-01 would have week 0 because first Monday (startOfWeek) of 2019 was the 7th
             LocalDate lastWeek = date.minusDays(7);
-            return getFinancialWeek(lastWeek) + 1;
+            return getCategorisedWeek(lastWeek) + 1;
         }
         // get to start of week to make calculation easier at next step
         int dayOfWeek = date.getDayOfWeek().getValue();
@@ -55,46 +52,49 @@ public class MyCalendar {
         return ((weekStartDayOfYear-firstWeekStartDayOfYear)/7) + 1;
     }
 
-    public int getFinancialMonth(LocalDate date) {
+    public int getCategorisedMonth(LocalDate date) {
         if (startOfMonth.isADay()) {
-            int startOfMonth = getFirstWeekStartOfMonth(MonthOfYear.get(date.getMonthValue()), date.getYear());
-            return (startOfMonth <= date.getDayOfMonth())
+            int firstWeekStartDayInMonth = getFirstWeekStartOfMonth(MonthOfYear.get(date.getMonthValue()), date.getYear());
+            return (firstWeekStartDayInMonth <= date.getDayOfMonth())
                     ? date.getMonthValue()
-                    : ((date.getMonthValue() > 1)
-                    ? date.getMonthValue() - 1
-                    : 12);
+                    : (getPreviousMonthValue(date));
         }
         LocalDate monthStartDate = LocalDate.of(date.getYear(), date.getMonthValue(), startOfMonth.getDayInMonth());
+        // determine if date provided is equal to or after the start of categorised month
         if (date.compareTo(monthStartDate) == 0 || date.isAfter(monthStartDate)) {
             return date.getMonthValue();
         } else {
-            return ((date.getMonthValue() > 1)
-                    ? date.getMonthValue() - 1
-                    : 12);
+            return getPreviousMonthValue(date);
         }
     }
 
-    public int getFinancialYear(LocalDate date) {
+    private int getPreviousMonthValue(LocalDate date) {
+        return (date.getMonthValue() > 1) ? date.getMonthValue() - 1 : 12;
+    }
+
+    public int getCategorisedYear(LocalDate date) {
         if (startOfYear.getDayOfWeek() != null && startOfYear.getMonthOfYear() == null) {
-            return (getFinancialMonth(date) == 12 && date.getMonthValue() == 1)
+            // we are looking at the first occurrence of a dayOfWeek here so will be in JANUARY
+            return (getCategorisedMonth(date) == 12 && date.getMonthValue() == 1)
                     ? date.getYear() - 1
                     : date.getYear();
         }
+        // find the date of the startOfYear
         LocalDate yearStartDate;
         if (startOfYear.getDayInMonth() != null) {
             yearStartDate = LocalDate.of(date.getYear(), startOfYear.getMonthOfYear().getIndex(), startOfYear.getDayInMonth());
         } else {
-            int dayInMonthForYear = getFirstWeekStartOfMonth(startOfYear.getDayOfWeek(), startOfYear.getMonthOfYear(), date.getYear());
-            yearStartDate = LocalDate.of(date.getYear(), startOfYear.getMonthOfYear().getIndex(), dayInMonthForYear);
+            // do the same as above but first calculate the dayInMonth for the first dayOfWeek in monthOfYear
+            int dayInMonth = getFirstWeekStartOfMonth(startOfYear.getDayOfWeek(), startOfYear.getMonthOfYear(), date.getYear());
+            yearStartDate = LocalDate.of(date.getYear(), startOfYear.getMonthOfYear().getIndex(), dayInMonth);
         }
+        // determine if date provided is equal to or after the start of categorised year
         if (date.isBefore(yearStartDate) && date.isAfter(yearStartDate.minusYears(1))) {
             return date.getYear() - 1;
         } else {
             return date.getYear();
         }
     }
-
-    // this is where things might be able to be removed
 
     private int getFirstWeekStartOfMonth(MonthOfYear monthOfYear, int year) {
         return getFirstWeekStartOfMonth(startOfWeek.getDayOfWeek(), monthOfYear, year);
