@@ -96,11 +96,11 @@ public class MyCalendar {
         }
     }
 
-    private int getFirstWeekStartOfMonth(MonthOfYear monthOfYear, int year) {
+    public int getFirstWeekStartOfMonth(MonthOfYear monthOfYear, int year) {
         return getFirstWeekStartOfMonth(startOfWeek.getDayOfWeek(), monthOfYear, year);
     }
 
-    int getFirstWeekStartOfMonth(DayOfWeek dayOfWeek, MonthOfYear monthOfYear, int year) {
+    public int getFirstWeekStartOfMonth(DayOfWeek dayOfWeek, MonthOfYear monthOfYear, int year) {
         // financial weeks are independent of financial months so we need only consider startOfWeek
         Calendar cacheCalendar = Calendar.getInstance();
         cacheCalendar.set(Calendar.DAY_OF_WEEK, dayOfWeek.asJavaUtilDayOfWeek());
@@ -110,7 +110,7 @@ public class MyCalendar {
         return cacheCalendar.get(Calendar.DATE);
     }
 
-    int getFirstWeekStartOfYear(int year) {
+    public int getFirstWeekStartOfYear(int year) {
         return getFirstWeekStartOfMonth(MonthOfYear.JANUARY, year);
     }
 
@@ -120,7 +120,7 @@ public class MyCalendar {
         return ((numDays - firstWeekStart) / 7) + 1;
     }
 
-    int weeksInYear(int year) {
+    public int weeksInYear(int year) {
         int sum = 0;
         for (MonthOfYear month : MonthOfYear.values()) {
             sum += weeksInMonth(month, year);
@@ -128,12 +128,12 @@ public class MyCalendar {
         return sum;
     }
 
-    static int daysInMonth(MonthOfYear monthOfYear, int year) {
+    public static int daysInMonth(MonthOfYear monthOfYear, int year) {
         Calendar myCal = new GregorianCalendar(year, monthOfYear.getIndex() - 1, 1);
         return myCal.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
-    static int daysInYear(int year) {
+    public static int daysInYear(int year) {
         Calendar myCal = new GregorianCalendar(year, MonthOfYear.JANUARY.getIndex() - 1, 1);
         return myCal.getActualMaximum(Calendar.DAY_OF_YEAR);
     }
