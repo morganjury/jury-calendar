@@ -26,11 +26,22 @@ public class MyCalendar {
         this(startOfWeek, new StartOfMonth(startOfWeek.getDayOfWeek()), new StartOfYear(startOfWeek.getDayOfWeek()));
     }
 
-
     public MyCalendar(StartOfWeek startOfWeek, StartOfMonth startOfMonth, StartOfYear startOfYear) {
         this.startOfWeek = startOfWeek;
         this.startOfMonth = startOfMonth;
         this.startOfYear = startOfYear;
+    }
+
+    public StartOfWeek getStartOfWeek() {
+        return startOfWeek;
+    }
+
+    public StartOfMonth getStartOfMonth() {
+        return startOfMonth;
+    }
+
+    public StartOfYear getStartOfYear() {
+        return startOfYear;
     }
 
     public int getCategorisedWeek(LocalDate date) {
