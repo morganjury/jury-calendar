@@ -27,6 +27,10 @@ public enum MonthOfYear {
         return index;
     }
 
+    public String getName() {
+        return name();
+    }
+
     public String getDisplayName() {
         return displayName;
     }
