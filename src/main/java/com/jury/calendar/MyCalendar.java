@@ -44,8 +44,12 @@ public class MyCalendar {
         return startOfYear;
     }
 
+    private MonthOfYear getStartOfYearMonthOfYear() {
+        return startOfYear.getMonthOfYear() == null ? MonthOfYear.JANUARY : startOfYear.getMonthOfYear();
+    }
+
     public int getCategorisedWeek(LocalDate date) {
-        LocalDate firstWeekStartOfYear = LocalDate.of(date.getYear(), MonthOfYear.JANUARY.getIndex(), getFirstWeekStartOfYear(date.getYear()));
+        LocalDate firstWeekStartOfYear = LocalDate.of(date.getYear(), getStartOfYearMonthOfYear().getIndex(), getFirstWeekStartOfYear(date.getYear()));
         if (date.isBefore(firstWeekStartOfYear)) {
             // bug where 2019-01-01 would have week 0 because first Monday (startOfWeek) of 2019 was the 7th
             LocalDate lastWeek = date.minusDays(7);
@@ -58,17 +62,18 @@ public class MyCalendar {
                 : 7 - (startOfWeek.getDayOfWeek().getIndex() - dayOfWeek);
         LocalDate weekStart = date.minusDays(daysAfterStartOfWeek);
         // number of days since start of year / number of days per week = number of weeks since start of year
+        // getDayOfYear assumes january 1st start of year, need to do date.dayofyear - startofyear.dayofyear in final calculation
         int firstWeekStartDayOfYear = firstWeekStartOfYear.getDayOfYear();
         int weekStartDayOfYear = weekStart.getDayOfYear();
-        return ((weekStartDayOfYear-firstWeekStartDayOfYear)/7) + 1;
+        return ((weekStartDayOfYear - firstWeekStartDayOfYear) / 7) + 1;
     }
 
     public int getCategorisedMonth(LocalDate date) {
         if (startOfMonth.isADay()) {
             int firstWeekStartDayInMonth = getFirstWeekStartOfMonth(MonthOfYear.get(date.getMonthValue()), date.getYear());
             return (firstWeekStartDayInMonth <= date.getDayOfMonth())
-                    ? date.getMonthValue()
-                    : (getPreviousMonthValue(date));
+                    ? (date.getMonthValue() - getStartOfYearMonthOfYear().getIndex() + 1)
+                    : getPreviousMonthValue(date);
         }
         LocalDate monthStartDate = LocalDate.of(date.getYear(), date.getMonthValue(), startOfMonth.getDayInMonth());
         // determine if date provided is equal to or after the start of categorised month
@@ -80,7 +85,7 @@ public class MyCalendar {
     }
 
     private int getPreviousMonthValue(LocalDate date) {
-        return (date.getMonthValue() > 1) ? date.getMonthValue() - 1 : 12;
+        return (date.getMonthValue() > getStartOfYearMonthOfYear().getIndex()) ? date.getMonthValue() - 1 : 12;
     }
 
     public int getCategorisedYear(LocalDate date) {
@@ -122,7 +127,7 @@ public class MyCalendar {
     }
 
     public int getFirstWeekStartOfYear(int year) {
-        return getFirstWeekStartOfMonth(MonthOfYear.JANUARY, year);
+        return getFirstWeekStartOfMonth(getStartOfYearMonthOfYear(), year);
     }
 
     public int weeksInMonth(MonthOfYear month, int year) {
