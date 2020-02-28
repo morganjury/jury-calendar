@@ -71,9 +71,18 @@ public class MyCalendar {
     public int getCategorisedMonth(LocalDate date) {
         if (startOfMonth.isADay()) {
             int firstWeekStartDayInMonth = getFirstWeekStartOfMonth(MonthOfYear.get(date.getMonthValue()), date.getYear());
-            return (firstWeekStartDayInMonth <= date.getDayOfMonth())
-                    ? (date.getMonthValue() - getStartOfYearMonthOfYear().getIndex() + 1)
-                    : getPreviousMonthValue(date);
+            if (firstWeekStartDayInMonth <= date.getDayOfMonth()) {
+                int monthIndex = date.getMonthValue() - getStartOfYearMonthOfYear().getIndex() + 1;
+                if (monthIndex < 1) {
+                    return monthIndex + 12;
+                } else if (monthIndex > 12) {
+                    return monthIndex - 12;
+                } else {
+                    return monthIndex;
+                }
+            } else {
+                return getPreviousMonthValue(date);
+            }
         }
         LocalDate monthStartDate = LocalDate.of(date.getYear(), date.getMonthValue(), startOfMonth.getDayInMonth());
         // determine if date provided is equal to or after the start of categorised month
