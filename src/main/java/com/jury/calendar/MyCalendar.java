@@ -94,7 +94,15 @@ public class MyCalendar {
     }
 
     private int getPreviousMonthValue(LocalDate date) {
-        return (date.getMonthValue() > getStartOfYearMonthOfYear().getIndex()) ? date.getMonthValue() - 1 : 12;
+        int monthOffset = getStartOfYearMonthOfYear().getIndex() - MonthOfYear.JANUARY.getIndex();
+        int previousMonthValue = date.getMonthValue() - 1 + (12 - monthOffset);
+        if (previousMonthValue < 1) {
+            return previousMonthValue + 12;
+        }
+        if (previousMonthValue > 12) {
+            return previousMonthValue - 12;
+        }
+        return previousMonthValue;
     }
 
     public int getCategorisedYear(LocalDate date) {
